@@ -2,4 +2,7 @@
 .vscode
 local.settings.json
 test
-.venv
+.venv*
+.env*
+venv*
+env*
