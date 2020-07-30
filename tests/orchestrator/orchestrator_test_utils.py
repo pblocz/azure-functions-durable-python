@@ -42,13 +42,33 @@ def assert_action_is_equal(expected_action, result_action):
 
 def get_orchestration_state_result(
         context_builder,
-        activity_func: Callable[[DurableOrchestrationContext], Iterator[Any]]):
+        activity_func: Callable[[DurableOrchestrationContext], Iterator[Any]],
+        export_to_json: bool = False):
     context_as_string = context_builder.to_json_string()
     orchestrator = Orchestrator(activity_func)
     result_of_handle = orchestrator.handle(
         DurableOrchestrationContext.from_json(context_as_string))
     result = json.loads(result_of_handle)
+    produce_reusable_testing_json(context_as_string, result_of_handle)
     return result
+
+def produce_reusable_testing_json(context: str, result):
+    context = json.loads(context)
+    result = json.loads(result)
+
+    json_tester = {
+        "orchestrator_name": context["instanceId"],
+        "orchestrator_input": context["input"],
+        "history": context["history"],
+        "extension_actions": result["actions"],
+        "required_features": ""
+    }
+    err_key = "error"
+    output_key = "output"
+    if "error" in result.keys():
+        json_tester["error_message"] = result[err_key]
+    elif output_key in result.keys():
+        json_tester["orchestrator_output"] = result[output_key]
 
 
 def assert_valid_schema(orchestration_state):
