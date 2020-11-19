@@ -11,18 +11,18 @@ class SerializableClass(object):
     and back respectively. These get called
     internally by the framework.
     """
-    def __init__(self, number: int):
+    def __init__(self, path: str):
         """ Construct the class
         Parameters
         ----------
-        number: int
-            A number to encapsulate
+        path: str
+            A path to encapsulate
         """
-        self.number = number
+        self.path = path
 
-    def show_number(self) -> int:
-        """" Returns the number value"""
-        return self.number
+    def show_path(self) -> str:
+        """" Returns the path value"""
+        return self.path
 
     @staticmethod
     def to_json(obj: object) -> str:
@@ -39,7 +39,7 @@ class SerializableClass(object):
         json_str: str
             A JSON-encoding of `obj`
         """
-        return str(obj.number)
+        return json.dumps({"path": obj.path})
 
     @staticmethod
     def from_json(json_str: str) -> object:
@@ -52,12 +52,12 @@ class SerializableClass(object):
         ----------
         json_str: str
             The JSON-encoding of a `SerializableClass` instance
-        
+
         Returns
         --------
         obj: SerializableClass
             A SerializableClass instance, de-serialized from `json_str`
         """
-        number = int(json_str)
-        obj = SerializableClass(number)
+        data = json.loads(json_str)
+        obj = SerializableClass(data["path"])
         return obj
